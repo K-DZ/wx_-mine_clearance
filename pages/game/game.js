@@ -11,7 +11,7 @@ Page({
       {key:"level_5",label:"LV5", rows: 20, cols: 24, num_boom: 99}],
 
     // init the parameter of this game
-    level:levels[0],
+    levelkey:"level_1",
     rows: 9,
     cols: 9,
     num_boom: 10,
@@ -23,8 +23,20 @@ Page({
   },
   select_level(){
     // ask the user for choosing the level of this game
-    const key = this.data.level
-    const level = this.data[key]
+    const levels = this.data.levels;
+    const levelKey = this.data.levelKey;
+    // const level = levels.find(l => l.key === levelKey);
+    // .find()函数用来找到一个元素，上面例子中就是元素l.key需要等于levelKey(三个等号表示值和数据类型全部相等)
+    let level = null;
+    for (let i = 0; i < levels.length; i++) {
+      if (levels[i].key === levelKey) {
+        level = levels[i];
+        break;
+      }
+    }
+
+    if (!level) return;
+
     this.setData({
       rows: level.rows,
       cols: level.cols,
