@@ -3,67 +3,69 @@
 Page({
   data: {
     // table of level with parameters
+    // store in an Array list so that game.wxml can render it conveniently
     levels: [
-      {key:"level_1",label:"LV1", rows: 9, cols: 9, num_boom: 10},
-      {key:"level_2",label:"LV2", rows: 9, cols: 12, num_boom: 20},
-      {key:"level_3",label:"LV3", rows: 12, cols: 12, num_boom: 30},
-      {key:"level_4",label:"LV4", rows: 16, cols: 16, num_boom: 50},
-      {key:"level_5",label:"LV5", rows: 20, cols: 24, num_boom: 99}],
+      {key:"level_1",label:"LV1", rows: 9, cols: 9, num_mine: 10},
+      {key:"level_2",label:"LV2", rows: 9, cols: 12, num_mine: 20},
+      {key:"level_3",label:"LV3", rows: 12, cols: 12, num_mine: 30},
+      {key:"level_4",label:"LV4", rows: 16, cols: 16, num_mine: 50},
+      {key:"level_5",label:"LV5", rows: 20, cols: 24, num_mine: 99}],
 
     // init the parameter of this game
     levelkey:"level_1",
     rows: 9,
     cols: 9,
-    num_boom: 10,
+    num_mine: 10,
 
-    board: [],
+    board: [],  //creat an empty arraylist for push the grids into a board
     gameOver: false,
     win: false,
-    // remainingCells: 0
+    remainingCells: 0   //this value is used for checking if the game is finished
+    // (when remainingCells = number of grids - num_mine
   },
   select_level(){
     // ask the user for choosing the level of this game
     const levels = this.data.levels;
     const levelKey = this.data.levelKey;
+
     // const level = levels.find(l => l.key === levelKey);
     // .find()函数用来找到一个元素，上面例子中就是元素l.key需要等于levelKey(三个等号表示值和数据类型全部相等)
-    let level = null;
+    let cur_level = null;
     for (let i = 0; i < levels.length; i++) {
       if (levels[i].key === levelKey) {
-        level = levels[i];
+        cur_level = levels[i];
         break;
       }
     }
 
-    if (!level) return;
+    if (!cur_level) return; //protect, prevent exceptions like cur_level = null
 
     this.setData({
-      rows: level.rows,
-      cols: level.cols,
-      num_boom: level.num_boom
+      rows: cur_level.rows,
+      cols: cur_level.cols,
+      num_mine: cur_level.num_mine
     });
   },
 
   init_game(){
-    const { rows, cols, num_boom } = this.data;
+    const { rows, cols, num_mine } = this.data;// 对象解构赋值：rows = this.data.rows; cols = this.data.cols......
     const board = this.creat_new_board(rows, cols)
-    this.set_booms(board)
-    this.set_help_nums(board)
-    
+    this.set_mines(board, num_mine)
+    this.set_help_nums(board)   //this function helps to calculate the     
   },
 
   creat_new_board(rows, cols){
     const board = [];
     for(let r = 0; r < rows; r++){
-      const row_array = [];
+      const row_array = [];   //creat an arraylist for each row
       for(let c = 0; c < cols; c++){
         const grid = {
           row: r,
           col: c,
           unclickable: false,
-          has_boom: false,
+          has_mine: false,
           has_flag: false,
-          // help_nums
+          help_num: 0
         }
         row_array.push(grid);
       }
@@ -72,30 +74,40 @@ Page({
     return board;
   },
 
-  set_booms(board) {
-    const { rows, cols, num_boom } = this.data;
+  set_mines(board, num_mine) {
+    const { rows, cols} = this.data;
 
     let count = 0;
-    while (count < num_boom) {
+    while (count < num_mine) {
       const r = Math.floor(Math.random() * rows);
       const c = Math.floor(Math.random() * cols);
 
-      if (board[r][c].has_boom == false) {
-        board[r][c].has_boom = true;
+      if (board[r][c].has_mine == false) {
+        board[r][c].has_mine = true;
         count++;
       }
     }
   },
 
-  /* set_help_nums(board){
-    for(grid in board){
-      if(){
 
+  /* set_help_nums(board){
+    const { rows, cols } = this.data;
+    for(let r = 0; r < rows; r++){
+      for(let c = 0; c < cols; c++){
+        const grid = board[r][c];
+        if(!grid.has_mine){
+          continue;
+        }
+        else{
+          if(){
+        grid.help_num += 1;
+      }
+        }
       }
     }
-  },
+  }, */
 
-  flag(){
+  /* flag(){
     
   }, */
 
@@ -104,7 +116,7 @@ Page({
    */
   onLoad(options) {
     this.select_level()
-    this.init_game();
+    // this.init_game();
   },
 
   /**

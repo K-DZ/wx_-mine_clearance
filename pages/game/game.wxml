@@ -8,4 +8,6 @@
         <button class="select_level" size="mini">LV5</button>
     </view>
     <view class="board"></view>
+    <button class="select_action" size="midium">Click</button>
+    <button class="select_action" size="midium">Flag</button>
 </view>
