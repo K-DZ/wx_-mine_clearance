@@ -1,0 +1,11 @@
+<!--pages/game.wxml-->
+<view class="game_page">
+    <view class="select">
+        <button class="select_level" size="mini">LV1</button>
+        <button class="select_level" size="mini">LV2</button>
+        <button class="select_level" size="mini">LV3</button>
+        <button class="select_level" size="mini">LV4</button>
+        <button class="select_level" size="mini">LV5</button>
+    </view>
+    <view class="board"></view>
+</view>

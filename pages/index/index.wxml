@@ -1,0 +1,35 @@
+<!--index.wxml-->
+<scroll-view class="scrollarea" scroll-y>
+  <view class="container">
+    <view class="userinfo">
+      <!-- 编辑呈现 -->
+      <view wx:if="{{!hasUserInfo}}">
+        <button class="avatar-wrapper" open-type="chooseAvatar" bind:chooseavatar="onChooseAvatar">
+          <image class="avatar" src="{{userInfo.avatarUrl}}"></image>
+        </button>
+        <view class="nickname-wrapper">
+          <text class="nickname-label">昵称</text>
+          <input type="nickname" class="nickname-input" placeholder="请输入昵称" bind:change="onInputChange" />
+        </view>
+      </view>
+
+      <!-- 完成编辑头像&&昵称 -->
+      <view wx:else class="userinfo-content">
+        <image class="userinfo-avatar" src="{{userInfo.avatarUrl}}" mode="cover"></image>
+        <text class="userinfo-nickname">{{userInfo.nickName}}</text>
+      </view>
+    </view>
+
+    <button
+      wx:if="{{hasUserInfo}}"
+      class="next-btn"
+      type="primary"
+      bindtap="handleNext"
+    >
+      下一步
+    </button>
+    <view class="usermotto">
+      <text class="user-motto">{{motto}}</text>
+    </view>
+  </view>
+</scroll-view>

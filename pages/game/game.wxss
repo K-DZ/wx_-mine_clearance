@@ -1,0 +1,11 @@
+/* pages/game.wxss */
+page,
+.game_page{
+    width: 100%;
+  height: 100%;
+  position: relative;
+}
+.select_level{
+  flex: 1;
+  margin: 0 8rpx;
+}
