@@ -12,21 +12,22 @@ Page({
       {key:"level_5",label:"LV5", rows: 20, cols: 24, num_mine: 99}],
 
     // init the parameter of this game
-    levelkey:"level_1",
+    levelKey:"level_1",
     rows: 9,
     cols: 9,
     num_mine: 10,
 
-    board: [],  //creat an empty arraylist for push the grids into a board
+    board: [],  //create an empty arraylist for push the grids into a board
     gameOver: false,
     win: false,
-    remainingCells: 0   //this value is used for checking if the game is finished
+    remainingCells: 0,   //this value is used for checking if the game is finished
     // (when remainingCells = number of grids - num_mine
+    showLevelSelect: true
   },
-  select_level(){
+
+  select_level(levelKey){
     // ask the user for choosing the level of this game
     const levels = this.data.levels;
-    const levelKey = this.data.levelKey;
 
     // const level = levels.find(l => l.key === levelKey);
     // .find()函数用来找到一个元素，上面例子中就是元素l.key需要等于levelKey(三个等号表示值和数据类型全部相等)
@@ -43,21 +44,22 @@ Page({
     this.setData({
       rows: cur_level.rows,
       cols: cur_level.cols,
-      num_mine: cur_level.num_mine
+      num_mine: cur_level.num_mine,
+      showLevelSelect: false
     });
   },
 
   init_game(){
     const { rows, cols, num_mine } = this.data;// 对象解构赋值：rows = this.data.rows; cols = this.data.cols......
-    const board = this.creat_new_board(rows, cols)
+    const board = this.create_new_board(rows, cols)
     this.set_mines(board, num_mine)
-    this.set_help_nums(board)   //this function helps to calculate the     
+    this.set_help_nums(board)   //this function helps to calculate the number should be shown on the grid.
   },
 
-  creat_new_board(rows, cols){
+  create_new_board(rows, cols){
     const board = [];
     for(let r = 0; r < rows; r++){
-      const row_array = [];   //creat an arraylist for each row
+      const row_array = [];   //create an arraylist for each row
       for(let c = 0; c < cols; c++){
         const grid = {
           row: r,
@@ -111,38 +113,30 @@ Page({
     
   }, */
 
-  /**
-   * 生命周期函数--监听页面加载
-   */
-  onLoad(options) {
-    this.select_level()
-    // this.init_game();
+
+  onLevelChoose(e) {
+    const key = e.currentTarget.dataset.key;
+    this.setData({ levelKey: key });
+    this.select_level(key);
+    this.init_game();
   },
 
-  /**
-   * 生命周期函数--监听页面初次渲染完成
-   */
+  //生命周期函数--监听页面初次渲染完成
   onReady() {
 
   },
 
-  /**
-   * 生命周期函数--监听页面显示
-   */
+  //生命周期函数--监听页面显示
   onShow() {
 
   },
 
-  /**
-   * 生命周期函数--监听页面卸载
-   */
+  //生命周期函数--监听页面卸载
   onUnload() {
 
   },
 
-  /**
-   * 用户点击右上角分享
-   */
+  //用户点击右上角分享
   onShareAppMessage() {
 
   }
