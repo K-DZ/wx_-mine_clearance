@@ -22,7 +22,8 @@ Page({
     win: false,
     remainingCells: 0,   //this value is used for checking if the game is finished
     // (when remainingCells = number of grids - num_mine
-    showLevelSelect: true
+    showLevelSelect: true,
+    actionMode: 'click'
   },
 
   select_level(levelKey){
@@ -53,7 +54,8 @@ Page({
     const { rows, cols, num_mine } = this.data;// 对象解构赋值：rows = this.data.rows; cols = this.data.cols......
     const board = this.create_new_board(rows, cols)
     this.set_mines(board, num_mine)
-    this.set_help_nums(board)   //this function helps to calculate the number should be shown on the grid.
+    //this.set_help_nums(board)   //this function helps to calculate the number should be shown on the grid.
+    this.setData({ board });
   },
 
   create_new_board(rows, cols){
@@ -64,7 +66,7 @@ Page({
         const grid = {
           row: r,
           col: c,
-          unclickable: false,
+          reveal: false,
           has_mine: false,
           has_flag: false,
           help_num: 0
@@ -119,6 +121,53 @@ Page({
     this.setData({ levelKey: key });
     this.select_level(key);
     this.init_game();
+  },
+
+  onClick(){
+    this.setData({ actionMode: 'click' });
+  },
+
+  onFlag(){
+    this.setData({ actionMode: 'flag' });
+  },
+
+  onReset(){
+    this.setData({showLevelSelect: true})
+  },
+
+  onGridTap(e) {
+    const r = e.currentTarget.dataset.row;
+    const c = e.currentTarget.dataset.col;
+    const mode = this.data.actionMode;
+    const board = this.data.board;
+
+    const grid = board[r][c];
+
+    if (mode === 'click') {
+      if(grid.has_mine){
+        this.setData({gameOver : true});
+
+        wx.showModal({
+          title: 'Game Over',
+          confirmText: 'Try Again',
+          cancelText: 'Reset',
+          success: (res) => {
+            if (res.confirm) {
+              this.init_game();
+            }
+            else if (res.cancel) {
+              this.onReset();
+            }
+          }
+        });
+      return;
+      }
+      grid.reveal = true;
+    } 
+    else if (mode === 'flag') {
+      grid.has_flag = !grid.has_flag;
+    }
+      this.setData({ board });
   },
 
   //生命周期函数--监听页面初次渲染完成

@@ -32,7 +32,6 @@ page {
 .userinfo-nickname {
   margin-top: 16rpx;
   font-size: 32rpx;
-  color: #00ff00;
   text-align: center;
   display: block;
 }

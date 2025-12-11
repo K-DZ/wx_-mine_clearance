@@ -17,16 +17,29 @@
         <view class="info">
             <text>当前难度：{{levelKey}}</text>
             <text wx:if="{{gameOver}}">
-                {{win ? '胜利' : '失败'}}
+                {{win ? 'WIN' : 'LOSE'}}
             </text>
         </view>
 
         <view class="board-placeholder">
-            <text>棋盘区域（下一步实现）</text>
+            <block wx:for="{{board}}" wx:key="row" wx:for-item="rowArr" wx:for-index="r">
+                <view class="row">
+                    <block wx:for="{{rowArr}}" wx:key="col" wx:for-item="grid" wx:for-index="c">
+                        <view 
+                        class="grid {{grid.reveal ? 'grid-open' : 'grid-close'}}"
+                        data-row="{{r}}"
+                        data-col="{{c}}"
+                        bindtap="onGridTap"
+                        >
+                        </view>
+                    </block>
+                </view>
+            </block>
         </view>
         <view class="action">
-            <button class="select_act action_click" size="default">Click</button>
-            <button class="select_act action_flag" size="default">Flag</button>
+            <button class="select_act action_click" size="default" bindtap="onClick">Click</button>
+            <button class="select_act action_flag" size="default" bindtap="onFlag">Flag</button>
+            <button class="select_act action_reset" size="default" bindtap="onReset">Reset</button>
         </view>
     </view>
 </view>
