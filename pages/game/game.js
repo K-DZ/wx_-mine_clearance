@@ -20,8 +20,8 @@ Page({
     board: [],  //create an empty arraylist for push the grids into a board
     gameOver: false,
     win: false,
-    remainingCells: 0,   //this value is used for checking if the game is finished
-    // (when remainingCells = number of grids - num_mine
+    remainingGrids: 0,   //this value is used for checking if the game is finished
+    // (when remainingGrids = number of grids - num_mine
     showLevelSelect: true,
     actionMode: 'click'
   },
@@ -46,6 +46,7 @@ Page({
       rows: cur_level.rows,
       cols: cur_level.cols,
       num_mine: cur_level.num_mine,
+      // remainingGrids:cur_level.rows*cur_level.cols-cur_level.num_mine,
       showLevelSelect: false
     });
   },
@@ -55,7 +56,11 @@ Page({
     const board = this.create_new_board(rows, cols)
     this.set_mines(board, num_mine)
     //this.set_help_nums(board)   //this function helps to calculate the number should be shown on the grid.
-    this.setData({ board });
+    this.setData({ 
+      board,
+      gameOver:false,
+      win:false
+     });
   },
 
   create_new_board(rows, cols){
@@ -86,7 +91,7 @@ Page({
       const r = Math.floor(Math.random() * rows);
       const c = Math.floor(Math.random() * cols);
 
-      if (board[r][c].has_mine == false) {
+      if (board[r][c].has_mine === false) {
         board[r][c].has_mine = true;
         count++;
       }
@@ -132,7 +137,61 @@ Page({
   },
 
   onReset(){
-    this.setData({showLevelSelect: true})
+    this.setData({
+      actionMode: 'click',
+      showLevelSelect: true})
+  },
+
+  onMine(e){
+    const r = e.currentTarget.dataset.row;
+    const c = e.currentTarget.dataset.col;
+    const mode = this.data.actionMode;
+    const board = this.data.board;
+    const grid = board[r][c];
+    grid.reveal = true;
+    this.setData({gameOver : true})
+    wx.showModal({
+      title: 'Game Over',
+      confirmText: '重试',  //查看文档时关注限制相关的描述，之前调用失败就是最多接受4个字符
+      cancelText: '重选',
+      success: (res) =>{
+        if (res.confirm) {
+          this.init_game();
+        }
+        else if (res.cancel) {
+          this.onReset();
+        }
+      }
+    });
+  return;
+  },
+
+  onEmpty(e){
+    const r = e.currentTarget.dataset.row;
+    const c = e.currentTarget.dataset.col;
+    // const mode = this.data.actionMode;
+    const board = this.data.board;
+    const grid = board[r][c];
+    grid.reveal = true;
+      // this.setData({remainingGrids: this.data.remainingGrids-1})
+      
+    for(let i= r>0? r-1: r; i<=r+1; i++){
+      for(let j= c>0? c-1 : c; j<=c+1; j++){
+        if(board[i][j].has_mine){
+          board[r][c].help_num+=1
+        }
+      }
+    }
+    if(board[r][c].help_num===0){
+      for(let i= r>0? r-1: r; i<=r+1; i++){
+        for(let j= c>0? c-1 : c; j<=c+1; j++){
+          if (i === r && j === c) {
+                    continue;
+                }
+                this.onEmpty(i, j);
+        }
+      }
+    }
   },
 
   onGridTap(e) {
@@ -140,31 +199,20 @@ Page({
     const c = e.currentTarget.dataset.col;
     const mode = this.data.actionMode;
     const board = this.data.board;
-
     const grid = board[r][c];
+    // let remainingGrids = r*c-this.data.num_mine;
 
     if (mode === 'click') {
       if(grid.has_mine){
-        this.setData({gameOver : true});
-
-        wx.showModal({
-          title: 'Game Over',
-          confirmText: 'Try Again',
-          cancelText: 'Reset',
-          success: (res) => {
-            if (res.confirm) {
-              this.init_game();
-            }
-            else if (res.cancel) {
-              this.onReset();
-            }
-          }
-        });
-      return;
+        this.onMine(e);
       }
-      grid.reveal = true;
+      this.onEmpty(e);
+      /* else if(remainingGrids === 0){
+        this.setData({win: true})
+      } */
     } 
     else if (mode === 'flag') {
+      if (grid.reveal) return;
       grid.has_flag = !grid.has_flag;
     }
       this.setData({ board });

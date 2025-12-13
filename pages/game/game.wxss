@@ -72,5 +72,5 @@
   font-size: 26rpx;
 }
 
-.grid-closed { background: #525252; }
+.grid-close { background: #354c7b; }
 .grid-open   { background: #f2f2f2; }
