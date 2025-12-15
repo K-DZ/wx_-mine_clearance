@@ -98,27 +98,35 @@ Page({
     }
   },
 
+  set_help_nums(r,c,board){
+    if(r < 0 || r >= board.length) return;
+    if(c < 0 || c >= board[0].length) return;
+    if(board[r][c].reveal) return;
+    if(board[r][c].has_mine) return;
 
-  /* set_help_nums(board){
-    const { rows, cols } = this.data;
-    for(let r = 0; r < rows; r++){
-      for(let c = 0; c < cols; c++){
-        const grid = board[r][c];
-        if(!grid.has_mine){
-          continue;
-        }
-        else{
-          if(){
-        grid.help_num += 1;
-      }
+    for(let i= (r===0 ? r: r-1); i<= (r === board.length-1? r : r+1); i++){
+      for(let j= (c===0 ? c : c-1); j<= (c === board[0].length-1 ? c : c+1); j++){
+        if (i === r && j === c) continue;
+        if(board[i][j].has_mine){
+          board[r][c].help_num+=1
         }
       }
     }
-  }, */
 
-  /* flag(){
-    
-  }, */
+    board[r][c].reveal = true;
+
+    if(board[r][c].help_num===0){
+      for(let i= (r===0? r: r-1); i<= (r === board.length? r : r+1); i++){
+        if(i < 0 || i >= board.length) continue;
+        for(let j= (c===0? c : c-1); j<=(c === board[0].length ? c : c+1); j++){
+          if(j < 0 || j >= board[0].length) continue;
+          if (i === r && j === c) continue;
+          // this.setData({board: board})
+          this.set_help_nums(i, j, board)
+        }
+      }
+    }
+  },
 
 
   onLevelChoose(e) {
@@ -163,35 +171,73 @@ Page({
         }
       }
     });
-  return;
+    return;
   },
 
   onEmpty(e){
-    const r = e.currentTarget.dataset.row;
-    const c = e.currentTarget.dataset.col;
-    // const mode = this.data.actionMode;
+    console.log('onEmpty 被调用');
+    
+    const r = parseInt(e.currentTarget.dataset.row);
+    const c = parseInt(e.currentTarget.dataset.col);
+    
+    // 获取 board 并检查
     const board = this.data.board;
-    const grid = board[r][c];
-    grid.reveal = true;
-      // this.setData({remainingGrids: this.data.remainingGrids-1})
-      
-    for(let i= r>0? r-1: r; i<=r+1; i++){
+    console.log(`点击位置: ${r} ${c}`);
+    console.log(`board:`, board ? '存在' : 'null');
+    console.log(`board大小: ${board ? board.length : 0} x ${board && board[0] ? board[0].length : 0}`);
+    
+    if (!board || !Array.isArray(board)) {
+        console.error('错误：board 无效');
+        return;
+    }
+    
+    if (r < 0 || r >= board.length) {
+        console.error(`行索引越界: r=${r}, board.length=${board.length}`);
+        return;
+    }
+    
+    const row = board[r];
+    if (!row || !Array.isArray(row)) {
+        console.error(`错误：第 ${r} 行无效`);
+        return;
+    }
+    
+    if (c < 0 || c >= row.length) {
+        console.error(`列索引越界: c=${c}, row.length=${row.length}`);
+        return;
+    }
+    
+    console.log(`格子:`, row[c]);
+    
+    // 调用递归函数
+    this.set_help_nums(r, c, board);
+    
+    // 更新视图
+    this.setData({
+      // remainingGrids: this.data.remainingGrids-1,
+        board: board
+    });
+    /* for(let i= r>0? r-1: r; i<=r+1; i++){
       for(let j= c>0? c-1 : c; j<=c+1; j++){
+        // let temp = [];
+        // temp.push(board[])
         if(board[i][j].has_mine){
           board[r][c].help_num+=1
         }
       }
     }
+
     if(board[r][c].help_num===0){
       for(let i= r>0? r-1: r; i<=r+1; i++){
         for(let j= c>0? c-1 : c; j<=c+1; j++){
+          board[i][j].reveal = true;
           if (i === r && j === c) {
-                    continue;
-                }
-                this.onEmpty(i, j);
+            continue;
+          }
+          this.set_help_nums(board[i][j])
         }
       }
-    }
+    } */
   },
 
   onGridTap(e) {
@@ -201,6 +247,7 @@ Page({
     const board = this.data.board;
     const grid = board[r][c];
     // let remainingGrids = r*c-this.data.num_mine;
+    if(grid.reveal) return;
 
     if (mode === 'click') {
       if(grid.has_mine){
@@ -217,24 +264,4 @@ Page({
     }
       this.setData({ board });
   },
-
-  //生命周期函数--监听页面初次渲染完成
-  onReady() {
-
-  },
-
-  //生命周期函数--监听页面显示
-  onShow() {
-
-  },
-
-  //生命周期函数--监听页面卸载
-  onUnload() {
-
-  },
-
-  //用户点击右上角分享
-  onShareAppMessage() {
-
-  }
 })

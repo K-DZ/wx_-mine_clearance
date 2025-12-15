@@ -32,7 +32,7 @@
                         bindtap="onGridTap"
                         >
                         <text wx:if="{{grid.has_mine}}">#</text>
-                        <text wx:if="{{grid.reveal}}">{{board[r][c].help_num}}</text>
+                        <text wx:if="{{grid.reveal && !grid.has_mine}}">{{board[r][c].help_num}}</text>
                         <text wx:if="{{grid.has_flag}}" style="color:red;">P</text>
                         </view>
                     </block>
