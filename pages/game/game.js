@@ -59,7 +59,8 @@ Page({
     this.setData({ 
       board,
       gameOver:false,
-      win:false
+      win:false,
+      remainingGrids:rows*cols-num_mine
      });
   },
 
@@ -99,6 +100,7 @@ Page({
   },
 
   set_help_nums(r,c,board){
+    let remainingGrids = this.data.remainingGrids;
     if(r < 0 || r >= board.length) return;
     if(c < 0 || c >= board[0].length) return;
     if(board[r][c].reveal) return;
@@ -114,6 +116,7 @@ Page({
     }
 
     board[r][c].reveal = true;
+    this.setData({remainingGrids: remainingGrids-1})
 
     if(board[r][c].help_num===0){
       for(let i= (r===0? r: r-1); i<= (r === board.length? r : r+1); i++){
@@ -153,7 +156,6 @@ Page({
   onMine(e){
     const r = e.currentTarget.dataset.row;
     const c = e.currentTarget.dataset.col;
-    const mode = this.data.actionMode;
     const board = this.data.board;
     const grid = board[r][c];
     grid.reveal = true;
@@ -174,15 +176,37 @@ Page({
     return;
   },
 
+  onWin(e){
+    const r = e.currentTarget.dataset.row;
+    const c = e.currentTarget.dataset.col;
+    const board = this.data.board;
+    const grid = board[r][c];
+    grid.reveal = true;
+    this.setData({win: true})
+    wx.showModal({
+      title: 'WIN!!!',
+      confirmText: '重试',  //查看文档时关注限制相关的描述，之前调用失败就是最多接受4个字符
+      cancelText: '重选',
+      success: (res) =>{
+        if (res.confirm) {
+          this.init_game();
+        }
+        else if (res.cancel) {
+          this.onReset();
+        }
+      }
+    });
+    return;
+  },
+
   onEmpty(e){
     console.log('onEmpty 被调用');
     
     const r = parseInt(e.currentTarget.dataset.row);
     const c = parseInt(e.currentTarget.dataset.col);
-    
-    // 获取 board 并检查
     const board = this.data.board;
-    console.log(`点击位置: ${r} ${c}`);
+
+    /* console.log(`点击位置: ${r} ${c}`);
     console.log(`board:`, board ? '存在' : 'null');
     console.log(`board大小: ${board ? board.length : 0} x ${board && board[0] ? board[0].length : 0}`);
     
@@ -207,43 +231,21 @@ Page({
         return;
     }
     
-    console.log(`格子:`, row[c]);
-    
-    // 调用递归函数
+    console.log(`格子:`, row[c]); */
+
     this.set_help_nums(r, c, board);
-    
-    // 更新视图
+
     this.setData({
       // remainingGrids: this.data.remainingGrids-1,
         board: board
     });
-    /* for(let i= r>0? r-1: r; i<=r+1; i++){
-      for(let j= c>0? c-1 : c; j<=c+1; j++){
-        // let temp = [];
-        // temp.push(board[])
-        if(board[i][j].has_mine){
-          board[r][c].help_num+=1
-        }
-      }
-    }
-
-    if(board[r][c].help_num===0){
-      for(let i= r>0? r-1: r; i<=r+1; i++){
-        for(let j= c>0? c-1 : c; j<=c+1; j++){
-          board[i][j].reveal = true;
-          if (i === r && j === c) {
-            continue;
-          }
-          this.set_help_nums(board[i][j])
-        }
-      }
-    } */
   },
 
   onGridTap(e) {
     const r = e.currentTarget.dataset.row;
     const c = e.currentTarget.dataset.col;
     const mode = this.data.actionMode;
+    const remainingGrids = this.data.remainingGrids;
     const board = this.data.board;
     const grid = board[r][c];
     // let remainingGrids = r*c-this.data.num_mine;
@@ -253,10 +255,10 @@ Page({
       if(grid.has_mine){
         this.onMine(e);
       }
+      else if(remainingGrids === 1){
+        this.onWin(e)
+      }
       this.onEmpty(e);
-      /* else if(remainingGrids === 0){
-        this.setData({win: true})
-      } */
     } 
     else if (mode === 'flag') {
       if (grid.reveal) return;
