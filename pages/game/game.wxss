@@ -36,11 +36,11 @@
   align-items: center;
   justify-content: center;
 }
-.text-lv1 { color: rgb(7, 255, 123); }
-.text-lv2 { color: rgb(147, 255, 7); }
+.text-lv1 { color: rgb(28, 210, 68); }
+.text-lv2 { color: rgb(185, 241, 2); }
 .text-lv3 { color: rgb(255, 238, 7); }
 .text-lv4 { color: rgb(255, 131, 7); }
-.text-lv5 { color: rgb(255, 28, 7); }
+.text-lv5 { color: rgb(231, 33, 33); }
 
 .select_act{
   background-color: #4359a0;
@@ -72,5 +72,5 @@
   font-size: 26rpx;
 }
 
-.grid-close { background: #354c7b; }
+.grid-close { background: #459bac; }
 .grid-open   { background: #f2f2f2; }
